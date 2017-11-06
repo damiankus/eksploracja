@@ -106,7 +106,7 @@ CREATE INDEX inventors_lastname_hash_idx ON inventors USING hash (lastnam);
 
 CREATE TABLE IF NOT EXISTS citations (
  CITING NUMERIC(7),
- citationsD NUMERIC(7)
+ CITED NUMERIC(7)
 );
 
 CREATE TABLE IF NOT EXISTS patent_inventor (
@@ -129,16 +129,18 @@ COPY patents FROM '/home/damian/Dokumenty/studia/eksploracja/dataset/csv/apat63_
 COPY inventors (PATENT, LASTNAM, FIRSTNAME, MIDNAM, MODIFNAM, STREET, CITY, POSTATE, COUNTRY, ZIP, INVSEQ) FROM '/home/damian/Dokumenty/studia/eksploracja/dataset/csv/ainventor.csv' WITH CSV HEADER;
 COPY citations FROM '/home/damian/Dokumenty/studia/eksploracja/dataset/csv/cite75_99.csv' WITH CSV HEADER;
 
-SELECT MAX(id) as id, lastnam, firstname 
+select * from unique_inventors where lastnam = 'Gooding' AND firstname='Elwyn';
+
+SELECT MAX(id) as id, lastnam, firstname, city
 INTO unique_inventors 
 FROM inventors
-GROUP BY lastnam, firstname;
+GROUP BY lastnam, firstname, city;
 
 INSERT INTO patent_inventor (PATENT_ID, INVENTOR_ID)
 SELECT i.PATENT, u.ID 
 FROM inventors as i
 JOIN unique_inventors AS u 
-ON (i.lastnam = u.lastnam AND i.firstname = u.firstname);
+ON (i.lastnam = u.lastnam AND i.firstname = u.firstname AND i.city = u.city);
 
 SELECT i.* INTO inv_tmp FROM inventors AS i
 JOIN unique_inventors AS u
