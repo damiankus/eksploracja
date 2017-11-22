@@ -99,25 +99,30 @@ BEGIN
 			HAVING COUNT(*) > %s
 			ORDER BY Source, Target
 		) TO ''/tmp/inv_threshold_within_%s_years_from_%s.csv'' WITH CSV DELIMITER '','' HEADER', y::text, y::text, (y + delta)::text, threshold::text, delta::text, y::text);
-		RAISE NOTICE 'year: %', stat;
+		RAISE NOTICE '%', stat;
 		EXECUTE stat;
 	END LOOP;
 END; $$ LANGUAGE plpgsql
 
-SELECT save_citations_within_period(2, 2);
 
-CREATE OR REPLACE FUNCTION save_citations_with_countries(delta integer, threshold integer)
+DROP FUNCTION save_citations_with_countries(integer, integer)
+CREATE OR REPLACE FUNCTION save_citations_with_countries(delta integer, threshold integer, step integer)
 RETURNS VOID AS $$
 DECLARE
 	min_year integer;
 	max_year integer;
-	stat text;
+	cit_stat text;
+	copy_nodes_stat text;
+	copy_edges_stat text;
 BEGIN
 	SELECT MIN(gyear) INTO min_year FROM patents;
 	SELECT MAX(gyear) INTO max_year FROM patents;
-	FOR y in (min_year)..(max_year - delta) LOOP
-		stat := format('COPY(
-			SELECT c_citing.country AS Source, c_cited.country AS Target, COUNT(*) AS Weight
+	
+	FOR y in (min_year)..(max_year - delta) BY step LOOP
+		CREATE TEMP TABLE citations_within_year AS 
+		(
+			SELECT pi_citing.inventor_id AS Source, pi_cited.inventor_id AS Target, COUNT(*) AS Weight,
+			c_citing.country AS citing_country, c_cited.country AS cited_country
 			FROM citations as ci
 			INNER JOIN patent_inventor AS pi_cited ON pi_cited.patent_id = ci.cited
 			INNER JOIN patent_inventor AS pi_citing ON pi_citing.patent_id = ci.citing
@@ -127,43 +132,39 @@ BEGIN
 			INNER JOIN inventors as i_citing ON i_citing.id = pi_citing.inventor_id
 			INNER JOIN countries as c_cited ON c_cited.code = i_cited.country
 			INNER JOIN countries as c_citing ON c_citing.code = i_citing.country
-			WHERE p_cited.gyear = %s AND p_citing.gyear BETWEEN %s AND %s
-			GROUP BY Target, Source
-			HAVING COUNT(*) > %s
+			WHERE p_cited.gyear = y AND p_citing.gyear BETWEEN $1 AND (y + delta)
+			GROUP BY cited_country, citing_country, Target, Source
+			HAVING COUNT(*) > threshold
 			ORDER BY Source, Target
-		) TO ''/tmp/country_within_%s_years_from_%s.csv'' WITH CSV DELIMITER '','' HEADER', y::text, y::text, (y + delta)::text, threshold::text, delta::text, y::text);
-		RAISE NOTICE 'year: %', stat;
-		EXECUTE stat;
+		);
+		
+		copy_edges_stat := format(
+		'COPY(
+		SELECT Source, Target, Weight
+		FROM citations_within_year
+		) TO ''/tmp/citations_within_%s_years_from_%s.csv'' WITH CSV DELIMITER '','' HEADER', delta::text, y::text);
+		EXECUTE copy_edges_stat;
+
+		copy_nodes_stat := format(
+		'COPY(
+		SELECT idc.id as Id, idc.country AS Label
+		FROM
+		(SELECT Source AS Id, citing_country AS country
+		FROM citations_within_year
+		UNION 
+		SELECT Target AS Id, cited_country AS country
+		FROM citations_within_year) AS idc
+		) TO ''/tmp/inventor_country_%s.csv'' WITH CSV DELIMITER '','' HEADER', y::text);
+		EXECUTE copy_nodes_stat;
+		RAISE NOTICE '%', copy_nodes_stat;
+		DROP TABLE citations_within_year;
 	END LOOP;
 END; $$ LANGUAGE plpgsql
 
-SELECT save_citations_within_period(2, 2);
-SELECT save_citations_with_countries(2, 2);
-
-select * from citations limit 100;
-ALTER TABLE citations RENAME COLUMN citationsd TO cited
-
-select * from countries limit 100;
+SELECT save_citations_with_countries(2, 2, 5);
 
 SELECT count(p.patent ) 
 FROM patents AS p
 LEFT JOIN patent_inventor AS pi
 ON pi.patent_id = p.patent
 WHERE pi.patent_id IS NULL;
-
-SELECT c_citing.country AS Source, c_cited.country AS Target, COUNT(*) AS Weight
-FROM citations as ci
-INNER JOIN patent_inventor AS pi_cited ON pi_cited.patent_id = ci.cited
-INNER JOIN patent_inventor AS pi_citing ON pi_citing.patent_id = ci.citing
-INNER JOIN patents as p_cited ON p_cited.patent = ci.cited
-INNER JOIN patents as p_citing ON p_citing.patent = ci.citing
-INNER JOIN inventors as i_cited ON i_cited.id = pi_cited.inventor_id
-INNER JOIN inventors as i_citing ON i_citing.id = pi_citing.inventor_id
-INNER JOIN countries as c_cited ON c_cited.code = i_cited.country
-INNER JOIN countries as c_citing ON c_citing.code = i_citing.country
-WHERE p_cited.gyear = 1978 AND p_citing.gyear BETWEEN 1978 AND 1979
-GROUP BY Target, Source
-HAVING COUNT(*) > 3
-ORDER BY Source, Target
-
-
