@@ -52,3 +52,118 @@ COPY(
 	GROUP BY referenced_by
 	ORDER BY patents_no DESC
 ) TO '/tmp/citations_histogram.csv' WITH CSV DELIMITER ',' HEADER;
+
+COPY(
+    SELECT c1.catnamelong AS citing, c2.catnamelong AS cited, COUNT(*) AS numberOfCitations
+    FROM citations
+    INNER JOIN patents AS p1 ON citations.citing = p1.patent
+    INNER JOIN patents AS p2 ON citations.cited = p2.patent
+    INNER JOIN categories AS c1 ON c1.cat = p1.cat
+    INNER JOIN categories AS c2 ON c2.cat = p2.cat
+    GROUP BY c1.catnamelong, c2.catnamelong
+) TO '/tmp/citations_between_categories.csv' WITH CSV DELIMITER ',' HEADER;
+
+COPY(
+	SELECT pi_citing.inventor_id AS Source, pi_cited.inventor_id AS Target, COUNT(*) AS Weight
+	FROM citations as ci
+	INNER JOIN patent_inventor AS pi_cited ON pi_cited.patent_id = ci.cited
+	INNER JOIN patent_inventor AS pi_citing ON pi_citing.patent_id = ci.citing
+	INNER JOIN patents as p_cited ON p_cited.patent = ci.cited
+	INNER JOIN patents as p_citing ON p_citing.patent = ci.citing
+	WHERE p_cited.gyear = p_citing.gyear
+	GROUP BY Target, Source
+	HAVING COUNT(*) > 1
+	ORDER BY Source, Target
+) TO '/tmp/citations_same_year.csv' WITH CSV DELIMITER ',' HEADER;
+
+
+CREATE OR REPLACE FUNCTION save_citations_within_period(delta integer, threshold integer)
+RETURNS VOID AS $$
+DECLARE
+	min_year integer;
+	max_year integer;
+	stat text;
+BEGIN
+	SELECT MIN(gyear) INTO min_year FROM patents;
+	SELECT MAX(gyear) INTO max_year FROM patents;
+	FOR y in (min_year)..(max_year - delta) LOOP
+		stat := format('COPY(
+			SELECT pi_citing.inventor_id AS Source, pi_cited.inventor_id AS Target, COUNT(*) AS Weight
+			FROM citations as ci
+			INNER JOIN patent_inventor AS pi_cited ON pi_cited.patent_id = ci.cited
+			INNER JOIN patent_inventor AS pi_citing ON pi_citing.patent_id = ci.citing
+			INNER JOIN patents as p_cited ON p_cited.patent = ci.cited
+			INNER JOIN patents as p_citing ON p_citing.patent = ci.citing
+			WHERE p_cited.gyear = %s AND p_citing.gyear BETWEEN %s AND %s
+			GROUP BY Target, Source
+			HAVING COUNT(*) > %s
+			ORDER BY Source, Target
+		) TO ''/tmp/inv_threshold_within_%s_years_from_%s.csv'' WITH CSV DELIMITER '','' HEADER', y::text, y::text, (y + delta)::text, threshold::text, delta::text, y::text);
+		RAISE NOTICE 'year: %', stat;
+		EXECUTE stat;
+	END LOOP;
+END; $$ LANGUAGE plpgsql
+
+SELECT save_citations_within_period(2, 2);
+
+CREATE OR REPLACE FUNCTION save_citations_with_countries(delta integer, threshold integer)
+RETURNS VOID AS $$
+DECLARE
+	min_year integer;
+	max_year integer;
+	stat text;
+BEGIN
+	SELECT MIN(gyear) INTO min_year FROM patents;
+	SELECT MAX(gyear) INTO max_year FROM patents;
+	FOR y in (min_year)..(max_year - delta) LOOP
+		stat := format('COPY(
+			SELECT c_citing.country AS Source, c_cited.country AS Target, COUNT(*) AS Weight
+			FROM citations as ci
+			INNER JOIN patent_inventor AS pi_cited ON pi_cited.patent_id = ci.cited
+			INNER JOIN patent_inventor AS pi_citing ON pi_citing.patent_id = ci.citing
+			INNER JOIN patents as p_cited ON p_cited.patent = ci.cited
+			INNER JOIN patents as p_citing ON p_citing.patent = ci.citing
+			INNER JOIN inventors as i_cited ON i_cited.id = pi_cited.inventor_id
+			INNER JOIN inventors as i_citing ON i_citing.id = pi_citing.inventor_id
+			INNER JOIN countries as c_cited ON c_cited.code = i_cited.country
+			INNER JOIN countries as c_citing ON c_citing.code = i_citing.country
+			WHERE p_cited.gyear = %s AND p_citing.gyear BETWEEN %s AND %s
+			GROUP BY Target, Source
+			HAVING COUNT(*) > %s
+			ORDER BY Source, Target
+		) TO ''/tmp/country_within_%s_years_from_%s.csv'' WITH CSV DELIMITER '','' HEADER', y::text, y::text, (y + delta)::text, threshold::text, delta::text, y::text);
+		RAISE NOTICE 'year: %', stat;
+		EXECUTE stat;
+	END LOOP;
+END; $$ LANGUAGE plpgsql
+
+SELECT save_citations_within_period(2, 2);
+SELECT save_citations_with_countries(2, 2);
+
+select * from citations limit 100;
+ALTER TABLE citations RENAME COLUMN citationsd TO cited
+
+select * from countries limit 100;
+
+SELECT count(p.patent ) 
+FROM patents AS p
+LEFT JOIN patent_inventor AS pi
+ON pi.patent_id = p.patent
+WHERE pi.patent_id IS NULL;
+
+SELECT c_citing.country AS Source, c_cited.country AS Target, COUNT(*) AS Weight
+FROM citations as ci
+INNER JOIN patent_inventor AS pi_cited ON pi_cited.patent_id = ci.cited
+INNER JOIN patent_inventor AS pi_citing ON pi_citing.patent_id = ci.citing
+INNER JOIN patents as p_cited ON p_cited.patent = ci.cited
+INNER JOIN patents as p_citing ON p_citing.patent = ci.citing
+INNER JOIN inventors as i_cited ON i_cited.id = pi_cited.inventor_id
+INNER JOIN inventors as i_citing ON i_citing.id = pi_citing.inventor_id
+INNER JOIN countries as c_cited ON c_cited.code = i_cited.country
+INNER JOIN countries as c_citing ON c_citing.code = i_citing.country
+WHERE p_cited.gyear = 1978 AND p_citing.gyear BETWEEN 1978 AND 1979
+GROUP BY Target, Source
+HAVING COUNT(*) > 3
+ORDER BY Source, Target
+
+
