@@ -105,20 +105,18 @@ BEGIN
 END; $$ LANGUAGE plpgsql
 
 
-DROP FUNCTION save_citations_with_countries(integer, integer)
-CREATE OR REPLACE FUNCTION save_citations_with_countries(delta integer, threshold integer, step integer)
+DROP FUNCTION save_citations_with_countries(integer, integer, integer, integer)
+CREATE OR REPLACE FUNCTION save_inventors_with_countries(start_year integer, delta integer, threshold integer, step integer)
 RETURNS VOID AS $$
 DECLARE
-	min_year integer;
 	max_year integer;
 	cit_stat text;
 	copy_nodes_stat text;
 	copy_edges_stat text;
 BEGIN
-	SELECT MIN(gyear) INTO min_year FROM patents;
 	SELECT MAX(gyear) INTO max_year FROM patents;
 	
-	FOR y in (min_year)..(max_year - delta) BY step LOOP
+	FOR y in (start_year)..(max_year - delta) BY step LOOP
 		CREATE TEMP TABLE citations_within_year AS 
 		(
 			SELECT pi_citing.inventor_id AS Source, pi_cited.inventor_id AS Target, COUNT(*) AS Weight,
@@ -132,22 +130,22 @@ BEGIN
 			INNER JOIN inventors as i_citing ON i_citing.id = pi_citing.inventor_id
 			INNER JOIN countries as c_cited ON c_cited.code = i_cited.country
 			INNER JOIN countries as c_citing ON c_citing.code = i_citing.country
-			WHERE p_cited.gyear = y AND p_citing.gyear BETWEEN $1 AND (y + delta)
+			WHERE p_cited.gyear = y AND p_citing.gyear BETWEEN y AND (y + delta)
 			GROUP BY cited_country, citing_country, Target, Source
-			HAVING COUNT(*) > threshold
+			HAVING COUNT(*) >= threshold
 			ORDER BY Source, Target
 		);
 		
 		copy_edges_stat := format(
 		'COPY(
-		SELECT Source, Target, Weight
+		SELECT Source, Target, Weight AS Label, Weight
 		FROM citations_within_year
 		) TO ''/tmp/citations_within_%s_years_from_%s.csv'' WITH CSV DELIMITER '','' HEADER', delta::text, y::text);
 		EXECUTE copy_edges_stat;
 
 		copy_nodes_stat := format(
 		'COPY(
-		SELECT idc.id as Id, idc.country AS Label
+		SELECT DISTINCT idc.id as Id, idc.country AS Label
 		FROM
 		(SELECT Source AS Id, citing_country AS country
 		FROM citations_within_year
@@ -161,10 +159,80 @@ BEGIN
 	END LOOP;
 END; $$ LANGUAGE plpgsql
 
-SELECT save_citations_with_countries(2, 2, 5);
+SELECT save_inventors_with_countries(1993, 2, 4, 1);
 
-SELECT count(p.patent ) 
-FROM patents AS p
-LEFT JOIN patent_inventor AS pi
-ON pi.patent_id = p.patent
-WHERE pi.patent_id IS NULL;
+
+DROP FUNCTION save_citations_graph(integer, integer, integer, integer)
+CREATE OR REPLACE FUNCTION save_citations_graph(start_year integer, delta integer, threshold integer, step integer)
+RETURNS VOID AS $$
+DECLARE
+	max_year integer;
+	cit_stat text;
+	copy_nodes_stat text;
+	copy_edges_stat text;
+BEGIN
+	SELECT MAX(gyear) INTO max_year FROM patents;
+	CREATE TEMP TABLE patent_max_inventor AS 
+	(
+		SELECT patent_id, MAX(inventor_id) as inventor_id
+		FROM patent_inventor
+		GROUP BY patent_id
+	);
+	
+	FOR y in (start_year)..(max_year - delta) BY step LOOP
+		CREATE TEMP TABLE citations_within_year AS 
+		(
+			SELECT ci.citing AS Source, ci.cited AS Target, 1 AS Weight,
+			c_citing.country AS citing_country, c_cited.country AS cited_country
+			FROM citations as ci
+			INNER JOIN patent_max_inventor AS pi_cited ON pi_cited.patent_id = ci.cited
+			INNER JOIN patent_max_inventor AS pi_citing ON pi_citing.patent_id = ci.citing
+			INNER JOIN patents as p_cited ON p_cited.patent = ci.cited
+			INNER JOIN patents as p_citing ON p_citing.patent = ci.citing
+			INNER JOIN inventors as i_cited ON i_cited.id = pi_cited.inventor_id
+			INNER JOIN inventors as i_citing ON i_citing.id = pi_citing.inventor_id
+			INNER JOIN countries as c_cited ON c_cited.code = i_cited.country
+			INNER JOIN countries as c_citing ON c_citing.code = i_citing.country
+			WHERE p_cited.gyear = y AND p_citing.gyear BETWEEN y AND (y + delta)
+		);
+		CREATE TEMP TABLE most_cited AS 
+		(
+			SELECT Source, c.Target, Weight, citing_country, cited_country
+			FROM citations_within_year as c
+			JOIN (
+				SELECT Target
+				FROM citations_within_year
+				GROUP BY Target
+				HAVING COUNT(Source) > threshold
+			) AS mc ON mc.Target = c.Target
+		);
+		copy_edges_stat := format(
+		'COPY(
+			SELECT Source, Target, Weight, Weight AS Label
+			FROM most_cited
+		) TO ''/tmp/citations_within_%s_years_from_%s.csv'' WITH CSV DELIMITER '','' HEADER', delta::text, y::text);
+		EXECUTE copy_edges_stat;
+
+		copy_nodes_stat := format(
+		'COPY(
+		SELECT DISTINCT Idc.id as Id, idc.country AS Label
+		FROM
+		(SELECT Source AS id, citing_country AS country
+		FROM most_cited
+		UNION 
+		SELECT Target AS Id, cited_country AS country
+		FROM most_cited) AS idc
+		) TO ''/tmp/inventor_country_%s.csv'' WITH CSV DELIMITER '','' HEADER', y::text);
+		EXECUTE copy_nodes_stat;
+		RAISE NOTICE '%', copy_nodes_stat;
+		DROP TABLE most_cited;
+		DROP TABLE citations_within_year;
+	END LOOP;
+	DROP TABLE patent_max_inventor;
+END; $$ LANGUAGE plpgsql;
+-- save_citations_graph(start_year integer, delta integer, threshold integer, step integer)
+SELECT save_citations_graph(1993, 2, 10, 1);
+
+
+
+SELECT MIN(gyear), MAX(gyear)  FROM patents;

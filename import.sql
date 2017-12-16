@@ -112,35 +112,40 @@ CREATE TABLE IF NOT EXISTS citations (
 CREATE TABLE IF NOT EXISTS patent_inventor (
   ID SERIAL PRIMARY KEY,
   PATENT_ID NUMERIC(7) REFERENCES patents(PATENT),
-  INVENTOR_ID INT REFERENCES inventors(ID)
+  INVENTOR_ID INT REFERENCES inventors(ID),
+  FIRSTNAME CHAR(15),
+  LASTNAM CHAR(20),
+  CITY CHAR(20)
 );
 
 -- IN CASE OF DENIAL OF ACCESS TO FILES RUN chmod a+rX filename
 -- ERRORS IN companies FILE : 703089, 722814, 
 
-COPY companies FROM '/home/damian/Dokumenty/studia/eksploracja/dataset/csv/aconame.csv' WITH CSV HEADER;
-COPY cusip_match FROM '/home/damian/Dokumenty/studia/eksploracja/dataset/csv/match.csv' WITH CSV HEADER;
-COPY countries FROM '/home/damian/Dokumenty/studia/eksploracja/dataset/csv/list_of_countries.csv' WITH CSV HEADER;
-COPY states FROM '/home/damian/Dokumenty/studia/eksploracja/dataset/csv/list_of_states.csv' WITH CSV HEADER;
-COPY classes FROM '/home/damian/Dokumenty/studia/eksploracja/dataset/csv/list_of_classes.csv' WITH CSV HEADER;
-COPY subcategories FROM '/home/damian/Dokumenty/studia/eksploracja/dataset/csv/subcategories.csv' WITH CSV HEADER;
-COPY class_match FROM '/home/damian/Dokumenty/studia/eksploracja/dataset/csv/class_match.csv' WITH CSV HEADER;
-COPY patents FROM '/home/damian/Dokumenty/studia/eksploracja/dataset/csv/apat63_99.csv' WITH CSV HEADER;
-COPY inventors (PATENT, LASTNAM, FIRSTNAME, MIDNAM, MODIFNAM, STREET, CITY, POSTATE, COUNTRY, ZIP, INVSEQ) FROM '/home/damian/Dokumenty/studia/eksploracja/dataset/csv/ainventor.csv' WITH CSV HEADER;
-COPY citations FROM '/home/damian/Dokumenty/studia/eksploracja/dataset/csv/cite75_99.csv' WITH CSV HEADER;
-
-select * from unique_inventors where lastnam = 'Gooding' AND firstname='Elwyn';
+COPY companies FROM '/home/damian/Dokumenty/eksploracja/dataset/csv/aconame.csv' WITH CSV HEADER;
+COPY cusip_match FROM '/home/damian/Dokumenty/eksploracja/dataset/csv/match.csv' WITH CSV HEADER;
+COPY countries FROM '/home/damian/Dokumenty/eksploracja/dataset/csv/list_of_countries.csv' WITH CSV HEADER;
+COPY states FROM '/home/damian/Dokumenty/eksploracja/dataset/csv/list_of_states.csv' WITH CSV HEADER;
+COPY classes FROM '/home/damian/Dokumenty/eksploracja/dataset/csv/list_of_classes.csv' WITH CSV HEADER;
+COPY subcategories FROM '/home/damian/Dokumenty/eksploracja/dataset/csv/subcategories.csv' WITH CSV HEADER;
+COPY class_match FROM '/home/damian/Dokumenty/eksploracja/dataset/csv/class_match.csv' WITH CSV HEADER;
+COPY patents FROM '/home/damian/Dokumenty/eksploracja/dataset/csv/apat63_99.csv' WITH CSV HEADER;
+COPY inventors (PATENT, LASTNAM, FIRSTNAME, MIDNAM, MODIFNAM, STREET, CITY, POSTATE, COUNTRY, ZIP, INVSEQ) FROM '/home/damian/Dokumenty/eksploracja/dataset/csv/ainventor.csv' WITH CSV HEADER;
+COPY citations FROM '/home/damian/Dokumenty/eksploracja/dataset/csv/cite75_99.csv' WITH CSV HEADER;
 
 SELECT MAX(id) as id, lastnam, firstname, city
 INTO unique_inventors 
 FROM inventors
 GROUP BY lastnam, firstname, city;
 
-INSERT INTO patent_inventor (PATENT_ID, INVENTOR_ID)
-SELECT i.PATENT, u.ID 
+INSERT INTO patent_inventor (PATENT_ID, INVENTOR_ID, FIRSTNAME, LASTNAM, CITY)
+SELECT i.PATENT, u.ID, i.FIRSTNAME, i.LASTNAM, i.CITY 
 FROM inventors as i
 JOIN unique_inventors AS u 
 ON (i.lastnam = u.lastnam AND i.firstname = u.firstname AND i.city = u.city);
+
+select * from inventors limit 10;
+select * from patent_inventor limit 1000;
+select * from patent_inventor where patent_id = 3858241;
 
 SELECT i.* INTO inv_tmp FROM inventors AS i
 JOIN unique_inventors AS u
