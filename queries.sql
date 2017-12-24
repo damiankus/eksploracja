@@ -195,7 +195,7 @@ BEGIN
 			INNER JOIN countries as c_citing ON c_citing.code = i_citing.country
 			WHERE p_cited.gyear = y AND p_citing.gyear BETWEEN y AND (y + delta)
 		);
-		CREATE TEMP TABLE most_cited AS 
+		CREATE TEMP TABLE frequently_cited AS 
 		(
 			SELECT Source, c.Target, Weight, citing_country, cited_country
 			FROM citations_within_year as c
@@ -204,13 +204,13 @@ BEGIN
 				FROM citations_within_year
 				GROUP BY Target
 				HAVING COUNT(Source) > threshold
-			) AS mc ON mc.Target = c.Target
+			) AS fc ON fc.Target = c.Target OR fc.Target = c.Source
 		);
 		copy_edges_stat := format(
 		'COPY(
 			SELECT Source, Target, Weight, Weight AS Label
-			FROM most_cited
-		) TO ''/tmp/citations_within_%s_years_from_%s.csv'' WITH CSV DELIMITER '','' HEADER', delta::text, y::text);
+			FROM frequently_cited
+		) TO ''/tmp/edges_citations_within_%s_years_from_%s_tresh_%s.csv'' WITH CSV DELIMITER '','' HEADER', delta::text, y::text, threshold::text);
 		EXECUTE copy_edges_stat;
 
 		copy_nodes_stat := format(
@@ -218,21 +218,90 @@ BEGIN
 		SELECT DISTINCT Idc.id as Id, idc.country AS Label
 		FROM
 		(SELECT Source AS id, citing_country AS country
-		FROM most_cited
+		FROM frequently_cited
 		UNION 
 		SELECT Target AS Id, cited_country AS country
-		FROM most_cited) AS idc
-		) TO ''/tmp/inventor_country_%s.csv'' WITH CSV DELIMITER '','' HEADER', y::text);
+		FROM frequently_cited) AS idc
+		) TO ''/tmp/nodes_inventor_country_%s_tresh_%s.csv'' WITH CSV DELIMITER '','' HEADER', y::text, threshold::text);
 		EXECUTE copy_nodes_stat;
 		RAISE NOTICE '%', copy_nodes_stat;
-		DROP TABLE most_cited;
+		DROP TABLE frequently_cited;
 		DROP TABLE citations_within_year;
 	END LOOP;
 	DROP TABLE patent_max_inventor;
 END; $$ LANGUAGE plpgsql;
 -- save_citations_graph(start_year integer, delta integer, threshold integer, step integer)
-SELECT save_citations_graph(1993, 2, 10, 1);
+SELECT save_citations_graph(1993, 2, 15, 1);
 
 
+DROP FUNCTION save_most_cited(Integer)
+CREATE OR REPLACE FUNCTION save_most_cited(top Integer)
+RETURNS VOID AS $$
+DECLARE
+	copy_nodes_stat text;
+	copy_edges_stat text;
+BEGIN
+	CREATE TEMP TABLE patent_max_inventor AS 
+	(
+		SELECT patent_id, MAX(inventor_id) as inventor_id
+		FROM patent_inventor
+		GROUP BY patent_id
+	);
+	CREATE TEMP TABLE most_cited AS 
+	(
+		SELECT cited, COUNT(citing) AS CitingNo
+		FROM citations
+		GROUP BY cited
+		ORDER BY CitingNo DESC
+		LIMIT top
+	);
+	
+	CREATE TEMP TABLE cited_countries AS 
+	(
+		SELECT ci.citing AS Source, ci.cited AS Target, 1 AS Weight,
+		c_citing.country AS citing_country, c_cited.country AS cited_country
+		FROM citations as ci
+		INNER JOIN most_cited AS mc ON mc.cited = ci.cited
+		INNER JOIN patent_max_inventor AS pi_cited ON pi_cited.patent_id = ci.cited
+		INNER JOIN patent_max_inventor AS pi_citing ON pi_citing.patent_id = ci.citing
+		INNER JOIN patents as p_cited ON p_cited.patent = ci.cited
+		INNER JOIN patents as p_citing ON p_citing.patent = ci.citing
+		INNER JOIN inventors as i_cited ON i_cited.id = pi_cited.inventor_id
+		INNER JOIN inventors as i_citing ON i_citing.id = pi_citing.inventor_id
+		INNER JOIN countries as c_cited ON c_cited.code = i_cited.country
+		INNER JOIN countries as c_citing ON c_citing.code = i_citing.country
+	);
 
-SELECT MIN(gyear), MAX(gyear)  FROM patents;
+	COPY (
+		SELECT * FROM most_cited
+	) TO '/tmp/most_cited.csv' WITH CSV DELIMITER ',' HEADER;
+	RAISE NOTICE 'Saved most cited patents ranking';
+	
+	copy_edges_stat := format(
+	'COPY(
+		SELECT Source, Target, Weight, Weight AS Label
+		FROM cited_countries
+	) TO ''/tmp/edges_most_cited_top%s.csv'' WITH CSV DELIMITER '','' HEADER', top::text);
+	EXECUTE copy_edges_stat;
+
+	copy_nodes_stat := format(
+		'COPY(
+		SELECT DISTINCT Idc.id as Id, idc.country AS Label
+		FROM
+		(SELECT Source AS id, citing_country AS country
+		FROM cited_countries
+		UNION 
+		SELECT Target AS Id, cited_country AS country
+		FROM cited_countries) AS idc
+		) TO ''/tmp/nodes_most_cited_top_%s.csv'' WITH CSV DELIMITER '','' HEADER', top::text);
+	EXECUTE copy_nodes_stat;
+	RAISE NOTICE '%', copy_nodes_stat;
+
+	DROP TABLE most_cited;
+	DROP TABLE cited_countries;
+	DROP TABLE patent_max_inventor;
+	
+END; $$ LANGUAGE plpgsql;
+-- save_citations_graph(start_year integer, delta integer, threshold integer, step integer)
+SELECT save_most_cited(15);
+
