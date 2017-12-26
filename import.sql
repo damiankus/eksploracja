@@ -159,3 +159,25 @@ ALTER TABLE inventors ADD PRIMARY KEY (id);
 ALTER TABLE patent_inventor ADD CONSTRAINT patent_inventor_inventor_id_fkey FOREIGN KEY (inventor_id) REFERENCES inventors(id);
 DROP TABLE unique_inventors;
 
+CREATE TABLE patent_citno AS 
+(
+	SELECT p.patent, p.gyear, p.country, p.assignee, p.nclass, p.subcat, citby.citedBy, citing.citingNo
+	FROM patents as p
+	JOIN (
+	SELECT cited, COUNT(citing) as citedBy
+	FROM citations
+	GROUP BY cited
+) AS cited ON cited.cited = p.patent
+JOIN (
+	SELECT citing, COUNT(cited) as citingNo
+	FROM citations
+	GROUP BY citing
+) AS citing ON citing.citing = p.patent
+);
+
+CREATE TABLE patent_max_inventor AS 
+(
+	SELECT patent_id, MAX(inventor_id) as inventor_id
+	FROM patent_inventor
+	GROUP BY patent_id
+);
