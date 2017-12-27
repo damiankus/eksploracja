@@ -76,6 +76,7 @@ COPY(
 	ORDER BY Source, Target
 ) TO '/tmp/citations_same_year.csv' WITH CSV DELIMITER ',' HEADER;
 
+-- ////////////////////////////////////////////////////////////
 
 CREATE OR REPLACE FUNCTION save_citations_within_period(delta integer, threshold integer)
 RETURNS VOID AS $$
@@ -104,6 +105,7 @@ BEGIN
 	END LOOP;
 END; $$ LANGUAGE plpgsql
 
+-- ////////////////////////////////////////////////////////////
 
 DROP FUNCTION save_citations_with_countries(integer, integer, integer, integer)
 CREATE OR REPLACE FUNCTION save_inventors_with_countries(start_year integer, delta integer, threshold integer, step integer)
@@ -159,8 +161,7 @@ BEGIN
 	END LOOP;
 END; $$ LANGUAGE plpgsql
 
-SELECT save_inventors_with_countries(1993, 2, 4, 1);
-
+-- ////////////////////////////////////////////////////////////
 
 DROP FUNCTION save_citations_cited_from_year(integer, integer, integer, integer)
 CREATE OR REPLACE FUNCTION save_citations_cited_from_year(start_year integer, delta integer, threshold integer, step integer)
@@ -231,9 +232,8 @@ BEGIN
 	END LOOP;
 	DROP TABLE patent_max_inventor;
 END; $$ LANGUAGE plpgsql;
--- save_citations_cited_from_year(start_year integer, delta integer, threshold integer, step integer)
-SELECT save_citations_cited_from_year(1993, 2, 15, 1);
 
+-- ////////////////////////////////////////////////////////////
 
 DROP FUNCTION save_most_cited(Integer)
 CREATE OR REPLACE FUNCTION save_most_cited(top Integer)
@@ -296,21 +296,20 @@ BEGIN
 	DROP TABLE cited_countries;
 	
 END; $$ LANGUAGE plpgsql;
-SELECT save_most_cited(15);
 
-patent_citno
+-- ////////////////////////////////////////////////////////////
 
 DROP FUNCTION save_citations_within_period(integer, integer, integer, integer)
-CREATE OR REPLACE FUNCTION save_citations_within_period(start_year integer, delta integer, threshold integer, step integer)
+CREATE OR REPLACE FUNCTION save_citations_within_period(start_year integer, end_year integer, delta integer, threshold integer, step integer)
 RETURNS VOID AS $$
 DECLARE
-	max_year integer;
 	cit_stat text;
+	copy_top_cited_stat text;
+	copy_top_citing_stat text;
 	copy_nodes_stat text;
 	copy_edges_stat text;
 BEGIN
-	SELECT MAX(gyear) INTO max_year FROM patents;
-	FOR y in (start_year)..(max_year - delta) BY step LOOP
+	FOR y in (start_year)..(end_year) BY step LOOP
 		CREATE TEMP TABLE citations_within_period AS 
 		(
 			SELECT ci.citing AS Source, ci.cited AS Target, 1 AS Weight
@@ -327,6 +326,53 @@ BEGIN
 			AND citing_no.citedby >= threshold
 		);
 
+		CREATE TEMP TABLE top_cited AS (
+			SELECT tp.*, inv.firstname || ' ' || inv.lastnam AS Inventor
+			FROM (
+				SELECT pc.patent, pc.citedby, pc.citingno, ctr.country, com.compname AS company, cls.title AS class, subcat.subcatname AS subcategory
+				FROM patent_citno AS pc
+				JOIN subcategories AS subcat ON subcat.subcat = pc.subcat
+				JOIN classes AS cls ON cls.class = pc.nclass
+				JOIN countries AS ctr ON ctr.code = pc.country
+				LEFT OUTER JOIN companies AS com ON com.assignee = pc.assignee
+				WHERE gyear BETWEEN 1993 AND 1995
+				ORDER BY citedby DESC
+				LIMIT 10
+			) AS tp
+			JOIN patent_inventor AS pi ON pi.patent_id = tp.patent
+			JOIN inventors AS inv ON inv.id = pi.inventor_id
+			ORDER BY citedby DESC, patent
+		);
+		copy_top_cited_stat := format(
+		'COPY(
+			SELECT * FROM top_cited
+		) TO ''/tmp/top_cited_within_%s_years_from_%s_tresh_%s.csv'' WITH CSV DELIMITER '','' HEADER', delta::text, y::text, threshold::text);
+		EXECUTE copy_top_cited_stat;
+
+		CREATE TEMP TABLE top_citing AS (
+			SELECT tp.*, inv.firstname || ' ' || inv.lastnam AS Inventor
+			FROM (
+				SELECT pc.patent, pc.citedby, pc.citingno, ctr.country, com.compname AS company, cls.title AS class, subcat.subcatname AS subcategory
+				FROM patent_citno AS pc
+				JOIN subcategories AS subcat ON subcat.subcat = pc.subcat
+				JOIN classes AS cls ON cls.class = pc.nclass
+				JOIN countries AS ctr ON ctr.code = pc.country
+				LEFT OUTER JOIN companies AS com ON com.assignee = pc.assignee
+				WHERE gyear BETWEEN 1993 AND 1995
+				ORDER BY citingno DESC
+				LIMIT 10
+			) AS tp
+			JOIN patent_inventor AS pi ON pi.patent_id = tp.patent
+			JOIN inventors AS inv ON inv.id = pi.inventor_id
+			ORDER BY citingno DESC, patent
+		);
+		copy_top_citing_stat := format(
+		'COPY(
+			SELECT * FROM top_citing
+		) TO ''/tmp/top_citing_within_%s_years_from_%s_tresh_%s.csv'' WITH CSV DELIMITER '','' HEADER', delta::text, y::text, threshold::text);
+		EXECUTE copy_top_citing_stat;
+		
+		
 		copy_edges_stat := format(
 		'COPY(
 			SELECT Source, Target, Weight, Weight AS Label
@@ -348,15 +394,53 @@ BEGIN
 		) TO ''/tmp/nodes_citations_within_%s_years_from_%s_tresh_%s.csv'' WITH CSV DELIMITER '','' HEADER', delta::text, y::text, threshold::text);
 		EXECUTE copy_nodes_stat;
 		RAISE NOTICE '%', copy_nodes_stat;
+		DROP TABLE top_cited;
+		DROP TABLE top_citing;
 		DROP TABLE citations_within_period;
 	END LOOP;
 END; $$ LANGUAGE plpgsql;
--- save_citations_within_period(start_year integer, delta integer, threshold integer, step integer)
-SELECT save_citations_within_period(1993, 2, 30, 1);
 
-15;4
-select * from patent_citno
-where patent = 5181162
+-- ////////////////////////////////////////////////////////////
 
-select * from citations
-where citing = 5181162
+DROP FUNCTION save_patent_data(integer, text)
+CREATE OR REPLACE FUNCTION save_patent_data(pid integer, fname text)
+RETURNS VOID AS $$
+DECLARE
+	copy_patent_stat text;
+BEGIN
+	CREATE TEMP TABLE patent_data AS (
+		SELECT pc.patent, pc.citedby, pc.citingno, ctr.country, com.compname AS company,
+			cls.title AS class, subcat.subcatname AS subcategory,
+			inv.firstname || ' ' || inv.lastnam AS inventor
+		FROM patent_citno AS pc
+		JOIN subcategories AS subcat ON subcat.subcat = pc.subcat
+		JOIN classes AS cls ON cls.class = pc.nclass
+		JOIN countries AS ctr ON ctr.code = pc.country
+		LEFT OUTER JOIN companies AS com ON com.assignee = pc.assignee
+		JOIN patent_inventor AS pi ON pi.patent_id = pc.patent
+		JOIN inventors AS inv ON inv.id = pi.inventor_id
+		WHERE pc.patent = pid
+		ORDER BY inv.lastnam, inv.firstname
+	);
+	copy_patent_stat := format(
+	'COPY(
+		SELECT * FROM patent_data
+	) TO ''/tmp/%s.csv'' WITH CSV DELIMITER '','' HEADER', fname::text);
+	EXECUTE copy_patent_stat;
+	DROP TABLE patent_data;
+END; $$ LANGUAGE plpgsql;
+
+
+-- ////////////////////////////////////////////////////////////
+-- ////////////////////////////////////////////////////////////
+
+
+-- start_year, end_year, delta, threshold, step
+SELECT save_citations_within_period(1993, 1993, 2, 30, 1);
+SELECT save_citations_within_period(1994, 1994, 2, 25, 1);
+SELECT save_citations_within_period(1995, 1995, 2, 17, 1);
+SELECT save_citations_within_period(1996, 1996, 2, 10, 1);
+SELECT save_citations_within_period(1997, 1997, 2, 5, 1);
+
+-- patent_id, file_name without directory and extension
+SELECT save_patent_data(5220501, 'betweenness_1993_2_t15');
