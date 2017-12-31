@@ -235,66 +235,40 @@ END; $$ LANGUAGE plpgsql;
 
 -- ////////////////////////////////////////////////////////////
 
-DROP FUNCTION save_most_cited(Integer)
-CREATE OR REPLACE FUNCTION save_most_cited(top Integer)
+DROP FUNCTION save_most_cited()
+CREATE OR REPLACE FUNCTION save_most_cited()
 RETURNS VOID AS $$
 DECLARE
 	copy_nodes_stat text;
 	copy_edges_stat text;
 BEGIN
-	CREATE TEMP TABLE most_cited AS 
-	(
-		SELECT cited, COUNT(citing) AS CitingNo
-		FROM citations
-		GROUP BY cited
-		ORDER BY CitingNo DESC
-		LIMIT top
-	);
-	
-	CREATE TEMP TABLE cited_countries AS 
-	(
-		SELECT ci.citing AS Source, ci.cited AS Target, 1 AS Weight,
-		c_citing.country AS citing_country, c_cited.country AS cited_country
-		FROM citations as ci
-		INNER JOIN most_cited AS mc ON mc.cited = ci.cited OR mc.cited = ci.citing
-		INNER JOIN patent_max_inventor AS pi_cited ON pi_cited.patent_id = ci.cited
-		INNER JOIN patent_max_inventor AS pi_citing ON pi_citing.patent_id = ci.citing
-		INNER JOIN patents as p_cited ON p_cited.patent = ci.cited
-		INNER JOIN patents as p_citing ON p_citing.patent = ci.citing
-		INNER JOIN inventors as i_cited ON i_cited.id = pi_cited.inventor_id
-		INNER JOIN inventors as i_citing ON i_citing.id = pi_citing.inventor_id
-		INNER JOIN countries as c_cited ON c_cited.code = i_cited.country
-		INNER JOIN countries as c_citing ON c_citing.code = i_citing.country
-	);
-
 	COPY (
-		SELECT * FROM most_cited
-	) TO '/tmp/most_cited.csv' WITH CSV DELIMITER ',' HEADER;
+		SELECT pc.patent, pc.citedby, pc.citingno, inv.firstname || ' ' || inv.lastnam AS inventor,
+			pc.gyear, ctr.country, com.compname AS company,
+			cls.title AS class, subcat.subcatname AS subcategory
+			
+		FROM (
+			SELECT *
+			FROM patent_citno
+			ORDER BY citedby DESC
+			LIMIT 10
+		) AS pc
+		JOIN subcategories AS subcat ON subcat.subcat = pc.subcat
+		JOIN classes AS cls ON cls.class = pc.nclass
+		JOIN countries AS ctr ON ctr.code = pc.country
+		LEFT OUTER JOIN companies AS com ON com.assignee = pc.assignee
+		JOIN patent_inventor AS pi ON pi.patent_id = pc.patent
+		JOIN inventors AS inv ON inv.id = pi.inventor_id
+		ORDER BY citedby DESC, inventor
+		
+	) TO '/tmp/most_cited_info.csv' WITH CSV DELIMITER ',' HEADER;
+	COPY (
+		SELECT patent, citedby
+		FROM patent_citno
+		ORDER BY citedby DESC
+		LIMIT 50
+	) TO '/tmp/most_cited_ranking.csv' WITH CSV DELIMITER ',' HEADER;
 	RAISE NOTICE 'Saved most cited patents ranking';
-	
-	copy_edges_stat := format(
-	'COPY(
-		SELECT Source, Target, Weight, Weight AS Label
-		FROM cited_countries
-	) TO ''/tmp/edges_most_cited_top%s.csv'' WITH CSV DELIMITER '','' HEADER', top::text);
-	EXECUTE copy_edges_stat;
-
-	copy_nodes_stat := format(
-		'COPY(
-		SELECT DISTINCT Idc.id as Id, idc.country AS Label
-		FROM
-		(SELECT Source AS id, citing_country AS country
-		FROM cited_countries
-		UNION 
-		SELECT Target AS Id, cited_country AS country
-		FROM cited_countries) AS idc
-		) TO ''/tmp/nodes_most_cited_top_%s.csv'' WITH CSV DELIMITER '','' HEADER', top::text);
-	EXECUTE copy_nodes_stat;
-	RAISE NOTICE '%', copy_nodes_stat;
-
-	DROP TABLE most_cited;
-	DROP TABLE cited_countries;
-	
 END; $$ LANGUAGE plpgsql;
 
 -- ////////////////////////////////////////////////////////////
@@ -335,7 +309,7 @@ BEGIN
 				JOIN classes AS cls ON cls.class = pc.nclass
 				JOIN countries AS ctr ON ctr.code = pc.country
 				LEFT OUTER JOIN companies AS com ON com.assignee = pc.assignee
-				WHERE gyear BETWEEN 1993 AND 1995
+				WHERE gyear BETWEEN y AND (y + delta)
 				ORDER BY citedby DESC
 				LIMIT 10
 			) AS tp
@@ -358,7 +332,7 @@ BEGIN
 				JOIN classes AS cls ON cls.class = pc.nclass
 				JOIN countries AS ctr ON ctr.code = pc.country
 				LEFT OUTER JOIN companies AS com ON com.assignee = pc.assignee
-				WHERE gyear BETWEEN 1993 AND 1995
+				WHERE gyear BETWEEN y AND (y + delta)
 				ORDER BY citingno DESC
 				LIMIT 10
 			) AS tp
@@ -402,34 +376,27 @@ END; $$ LANGUAGE plpgsql;
 
 -- ////////////////////////////////////////////////////////////
 
-DROP FUNCTION save_patent_data(integer, text)
-CREATE OR REPLACE FUNCTION save_patent_data(pid integer, fname text)
-RETURNS VOID AS $$
-DECLARE
-	copy_patent_stat text;
+DROP FUNCTION get_patent_data(integer)
+CREATE OR REPLACE FUNCTION get_patent_data(pid integer)
+RETURNS TABLE(patent NUMERIC(7), inventor TEXT, citedby BIGINT, citingno BIGINT,
+	      country VARCHAR(128), company CHAR(80), class CHAR(256),
+	      subcategory VARCHAR(128)) AS $$
 BEGIN
-	CREATE TEMP TABLE patent_data AS (
-		SELECT pc.patent, pc.citedby, pc.citingno, ctr.country, com.compname AS company,
-			cls.title AS class, subcat.subcatname AS subcategory,
-			inv.firstname || ' ' || inv.lastnam AS inventor
-		FROM patent_citno AS pc
-		JOIN subcategories AS subcat ON subcat.subcat = pc.subcat
-		JOIN classes AS cls ON cls.class = pc.nclass
-		JOIN countries AS ctr ON ctr.code = pc.country
-		LEFT OUTER JOIN companies AS com ON com.assignee = pc.assignee
-		JOIN patent_inventor AS pi ON pi.patent_id = pc.patent
-		JOIN inventors AS inv ON inv.id = pi.inventor_id
-		WHERE pc.patent = pid
-		ORDER BY inv.lastnam, inv.firstname
-	);
-	copy_patent_stat := format(
-	'COPY(
-		SELECT * FROM patent_data
-	) TO ''/tmp/%s.csv'' WITH CSV DELIMITER '','' HEADER', fname::text);
-	EXECUTE copy_patent_stat;
-	DROP TABLE patent_data;
+	RETURN QUERY
+	SELECT pc.patent, inv.firstname || ' ' || inv.lastnam AS inventor, pc.citedby, pc.citingno, ctr.country, com.compname AS company,
+		cls.title AS class, subcat.subcatname AS subcategory
+		
+	FROM patent_citno AS pc
+	JOIN subcategories AS subcat ON subcat.subcat = pc.subcat
+	JOIN classes AS cls ON cls.class = pc.nclass
+	JOIN countries AS ctr ON ctr.code = pc.country
+	LEFT OUTER JOIN companies AS com ON com.assignee = pc.assignee
+	JOIN patent_inventor AS pi ON pi.patent_id = pc.patent
+	JOIN inventors AS inv ON inv.id = pi.inventor_id
+	WHERE pc.patent = pid
+	ORDER BY inv.lastnam, inv.firstname;
 END; $$ LANGUAGE plpgsql;
-
+SELECT * FROM get_patent_data(5421819);
 
 -- ////////////////////////////////////////////////////////////
 -- ////////////////////////////////////////////////////////////
@@ -443,4 +410,52 @@ SELECT save_citations_within_period(1996, 1996, 2, 10, 1);
 SELECT save_citations_within_period(1997, 1997, 2, 5, 1);
 
 -- patent_id, file_name without directory and extension
-SELECT save_patent_data(5220501, 'betweenness_1993_2_t15');
+-- 1993
+-- betweenness
+-- closeness
+
+-- =========
+
+-- 1994
+-- betweenness
+
+-- closeness
+
+-- =========
+
+-- 1995
+-- betweenness
+
+-- closeness
+
+-- =========
+
+-- 1996
+-- betweenness
+
+-- closeness
+
+-- =========
+
+-- 1997
+-- betweenness
+
+-- closeness
+
+-- =========
+
+SELECT save_most_cited();
+
+
+SELECT pc.patent, pc.gyear, pc.citedby, pc.citingno, ctr.country, com.compname AS company,
+	cls.title AS class, subcat.subcatname AS subcategory,
+	inv.firstname || ' ' || inv.lastnam AS inventor
+FROM patent_citno AS pc
+JOIN subcategories AS subcat ON subcat.subcat = pc.subcat
+JOIN classes AS cls ON cls.class = pc.nclass
+JOIN countries AS ctr ON ctr.code = pc.country
+LEFT OUTER JOIN companies AS com ON com.assignee = pc.assignee
+JOIN patent_inventor AS pi ON pi.patent_id = pc.patent
+JOIN inventors AS inv ON inv.id = pi.inventor_id
+WHERE pc.patent = 5471527
+ORDER BY inv.lastnam, inv.firstname
