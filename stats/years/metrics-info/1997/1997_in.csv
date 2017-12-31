@@ -1,0 +1,11 @@
+Id,indegree,outdegree,inventor,citedby,citingno,country,company,class,subcategory
+"5598464","8","0","Thomas Hess, William Minch","31","13","UNITED STATES","DSC COMMUNICATIONS CORPORATION","Telephonic Communications","Communications"
+"5623656","8","0","Kenneth Lyons","19","4","UNITED STATES","LUCENT TECHNOLOGIES INC.","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5625781","8","0","Troy Cline, Ricky Poston, Jon Werner","32","9","UNITED STATES","INTERNATIONAL BUSINESS MACHINES CORPORATION","Computer Graphics Processing, Operator Interface Processing, and Selective Visual Display Systems","Computer Peripherials"
+"5630118","8","0","Daniel Shaughnessy","25","5","UNITED STATES","2000, INC.","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5649186","7","0","Gregory Ferguson","44","4","UNITED STATES","SILICON GRAPHICS, INC.","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5617565","5","0","Joseph Augenbraun, Larry Pearlstein, Michael Plotnick","25","20","UNITED STATES","HITACHI AMERICA, LTD.","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5644762","5","0","Thomas Soeder","17","10","UNITED STATES","RESOLVE 2000, INC.","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5591924","4","0","John Hilton","16","13","UNITED STATES","SPACETEC IMC CORPORATION","Measuring and Testing","Measuring & Testing"
+"5596744","4","0","Son Dao, Nader Ebeid","34","19","UNITED STATES","HUGHES AIRCRAFT COMPANY","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5598285","4","0","Hidetoshi Abe, Genshiro Kawachi, Katsumi Kondo, Masuyuki Ohta, Junichi Ohwada, Tohru Sasaki, Kenkichi Suzuki, Hiromu Terao","31","2","JAPAN","HITACHI, LTD","Liquid Crystal Cells, Elements and Systems","Miscellaneous-chemical"

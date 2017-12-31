@@ -1,0 +1,11 @@
+Id,indegree,outdegree,betweenesscentrality,inventor,citedby,citingno,country,company,class,subcategory
+"5488000","3","2","3.5","Satoshi Teramoto, Hongyong Zhang","35","5","JAPAN","SEMICONDUCTOR ENERGY LABORATORY CO., LTD.","Semiconductor Device Manufacturing: Process","Semiconductor Devices"
+"5548730","2","2","3.5","Rick Coulson, Bruce Young","36","6","UNITED STATES","INTEL CORPORATION","Electrical Computers and Digital Data Processing Systems:  Input/Output","Computer Hardware & Software"
+"5598464","1","4","3.333333","Thomas Hess, William Minch","31","13","UNITED STATES","DSC COMMUNICATIONS CORPORATION","Telephonic Communications","Communications"
+"5572643","1","6","10","David Judson","173","19","UNITED STATES","None","Electrical Computers and Digital Processing Systems:  Multiple Computer or Process Coordinating","Computer Hardware & Software"
+"5515490","1","3","6","M. Buchanan, Polle Zellweger","22","9","UNITED STATES","XEROX CORPORATION","Computer Graphics Processing, Operator Interface Processing, and Selective Visual Display Systems","Computer Peripherials"
+"5555383","1","5","4","Uri Elazar, Yehuda Peled","28","7","ISRAEL","INTERNATIONAL BUSINESS MACHINES CORPORATION","Electrical Computers and Digital Data Processing Systems:  Input/Output","Computer Hardware & Software"
+"5493568","1","3","3","Gunner Danneels, Krishnan Rajamani, Ketan Sampat","17","23","UNITED STATES","INTEL CORPORATION","Multiplex Communications","Communications"
+"5499371","2","1","3","Derek Henninger, Richard Jensen, Christopher Keene","59","6","UNITED STATES","PERSISTENCE SOFTWARE, INC.","Information Processing System Organization","Computer Hardware & Software"
+"5548749","1","2","3","Lee Eggebroten, Kenji Kawai, David Kroenke, Christopher Olds","31","8","UNITED STATES","WALL DATA INCORPORATED","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5448568","1","2","2","Alain Delpuch, Jean-Rene Menand","31","13","UNITED STATES","THOMSON CONSUMER ELECTRONICS, INC.","Television","Miscellaneous-Elec"

@@ -1,0 +1,11 @@
+Id,indegree,outdegree,clustering,inventor,citedby,citingno,country,company,class,subcategory
+"5596746","2","0","0.5","Michael Blaha, William Premerlani, Hwa Shen","17","4","UNITED STATES","GENERAL ELECTRIC COMPANY","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5644764","2","0","0.5","Sridhar Iyengar, Peter Johnson","6","4","UNITED STATES","UNISYS CORPORATION","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5689555","1","1","0.5","Edward Sonnenberg","15","30","UNITED STATES","SIEMENS STROMBERG-CARLSON","Telephonic Communications","Communications"
+"5696816","1","1","0.5","Edward Sonnenberg","17","30","UNITED STATES","SIEMENS STROMBERG-CARLSON","Telephonic Communications","Communications"
+"5740128","1","1","0.5","Christopher Cole, John Hossack, Jian-Hua Mo","10","23","UNITED STATES","ACUSON CORPORATION","Communications, Electrical: Acoustic Wave Systems and Devices","Communications"
+"5768510","1","1","0.5","Sheri Gish","16","8","UNITED STATES","SUN MICROSYSTEMS, INC.","Electrical Computers and Digital Processing Systems:  Multiple Computer or Process Coordinating","Computer Hardware & Software"
+"5721911","1","2","0.333333","Khanh Ha, Jacques Labrie, David Salinero","8","12","UNITED STATES","INTERNATIONAL BUSINESS MACHINES CORPORATION","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5596723","3","0","0.166667","Steven Romohr","18","9","UNITED STATES","DELL USA, L.P.","Electrical Computers and Digital Processing Systems:  Multiple Computer or Process Coordinating","Computer Hardware & Software"
+"5608690","3","0","0.166667","Christopher Cole, John Hossack, Jian-Hua Mo","32","22","UNITED STATES","ACUSON CORPORATION","Communications, Electrical: Acoustic Wave Systems and Devices","Communications"
+"5737735","1","2","0.166667","Thomas Soeder","5","15","UNITED STATES","RESOLVE 2000, INC.","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"

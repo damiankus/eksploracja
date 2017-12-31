@@ -1,0 +1,11 @@
+Id,indegree,outdegree,betweenesscentrality,inventor,citedby,citingno,country,company,class,subcategory
+"5442390","4","3","8.5","Peter Bixby, Matthew Goldman, Donald Hooper, Suban Krishnamoorthy","92","22","UNITED STATES","DIGITAL EQUIPMENT CORPORATION","Television","Miscellaneous-Elec"
+"5421819","1","16","7.5","James Baker, Stuart Edwards, Ronald Lax, Ingemar Lundquist, Hugh Sharkey","40","183","UNITED STATES","VIDAMED, INC.","Surgery","Surgery & Med Inst."
+"5435805","1","16","7.5","James Baker, Stuart Edwards, Ronald Lax, Ingemar Lundquist, Hugh Sharkey","46","182","UNITED STATES","VIDAMED, INC.","Surgery","Surgery & Med Inst."
+"5385544","4","3","7","Stuart Edwards, Ronald Lax, Ingemar Lundquist, Hugh Sharkey, Bruno Strul","61","144","UNITED STATES","VIDAMED, INC.","Surgery","Surgery & Med Inst."
+"5459860","1","4","5","Colin Burnett, Garry Haas","33","9","AUSTRALIA","INTERNATIONAL BUSINESS MACHINES CORPORATION","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5421008","1","3","3","Kenneth Banning, Wendy James, Shih-Gong Li","37","15","UNITED STATES","INTERNATIONAL BUSINESS MACHINES CORPORATION","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5452350","3","1","3","Edward Bonkowski, Joel Dalsky, Dean Pannell, Henry Reynolds, Joyce Schmidt","49","18","UNITED STATES","ADVANTIS","Telephonic Communications","Communications"
+"5511122","1","3","3","Randall Atkinson","27","9","UNITED STATES","UNITED STATES OF AMERICA, NAVY","Electrical Computers and Digital Processing Systems:  Support","Computer Hardware & Software"
+"5329619","2","1","2","Omid Ejtemai-Jandaghi, Terence Kennedy, Peter Page, Ruediger Warns","127","7","GERMANY","SOFTWARE AG","Electrical Computers and Digital Processing Systems:  Multiple Computer or Process Coordinating","Computer Hardware & Software"
+"5357510","1","2","2","Susumu Eda, Hiroyuki Hatta, Ryuji Hyodo, Reiko Norizuki, Katsumi Oomuro, Osamu Sekihata, Kenji Tanaka","43","6","JAPAN","FUJITSU LIMITED","Multiplex Communications","Communications"

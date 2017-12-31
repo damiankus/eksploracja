@@ -1,0 +1,11 @@
+Id,indegree,outdegree,inventor,citedby,citingno,country,company,class,subcategory
+"5421819","0","31","James Baker, Stuart Edwards, Ronald Lax, Ingemar Lundquist, Hugh Sharkey","40","183","UNITED STATES","VIDAMED, INC.","Surgery","Surgery & Med Inst."
+"5435805","0","31","James Baker, Stuart Edwards, Ronald Lax, Ingemar Lundquist, Hugh Sharkey","46","182","UNITED STATES","VIDAMED, INC.","Surgery","Surgery & Med Inst."
+"5456662","0","31","David Douglass, Stuart Edwards","35","182","UNITED STATES","None","Surgery","Surgery & Med Inst."
+"5470308","0","31","Stuart Edwards, Ronald Lax, Ingemar Lundquist, Hugh Sharkey","37","182","UNITED STATES","VIDAMED, INC.","Surgery","Surgery & Med Inst."
+"5452289","0","19","Jeffrey Davis, Timothy Gunn, Ping Li, Sidhartha Maitra, Raghu Sharma, Ashish Thanawala, Steve Young","41","90","UNITED STATES","MULTI-TECH SYSTEMS, INC.","Multiplex Communications","Communications"
+"5366490","0","15","Stuart Edwards, Ronald Lax, Ingemar Lundquist, Hugh Sharkey","57","146","UNITED STATES","VIDAMED, INC.","Surgery: Light, Thermal, and Electrical Application","Surgery & Med Inst."
+"5370675","0","14","Stuart Edwards, Ronald Lax, Ingemar Lundquist, Hugh Sharkey","72","146","UNITED STATES","VIDAMED, INC.","Surgery: Light, Thermal, and Electrical Application","Surgery & Med Inst."
+"5385544","0","14","Stuart Edwards, Ronald Lax, Ingemar Lundquist, Hugh Sharkey, Bruno Strul","61","144","UNITED STATES","VIDAMED, INC.","Surgery","Surgery & Med Inst."
+"5409453","0","14","Stuart Edwards, Ingemar Lundquist","44","148","UNITED STATES","VIDAMED, INC.","Surgery","Surgery & Med Inst."
+"5472441","0","14","Stuart Edwards, Ronald Lax","58","85","UNITED STATES","ZOMED INTERNATIONAL, INC.","Surgery","Surgery & Med Inst."

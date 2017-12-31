@@ -1,0 +1,11 @@
+Id,indegree,outdegree,closnesscentrality,inventor,citedby,citingno,country,company,class,subcategory
+"5636292","0","17","0.904762","Geoffrey Rhoads","27","135","UNITED STATES","DIGIMARC CORPORATION","Image Analysis","Computer Hardware & Software"
+"5659742","0","4","0.833333","James Beattie, Lawrence Husick, Michael Krupit, Howard Morgan","18","10","UNITED STATES","INFONAUTICS CORPORATION","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5691974","0","4","0.833333","Stephen Carter, Klein Gilhousen, Ephraim Zehavi","22","30","ISRAEL","QUALCOMM, INC.","Multiplex Communications","Communications"
+"5526404","0","3","0.8","Paul Monte, Robert Wiedeman","19","21","UNITED STATES","SPACE SYSTEMS/LORAL, INC.","Telecommunications","Communications"
+"5591197","0","3","0.8","Scott Anderson, Peter Brown, Geoffrey Orth","39","10","UNITED STATES","ADVANCED CARDIOVASCULAR SYSTEMS, INC.","Prosthesis (i.e., Artificial Body Members), Parts Thereof, or Aids and Accessories Therefor","Miscellaneous-Drgs&Med"
+"5625818","0","3","0.8","Kevin Arnold, Paul Chambers, Tom Eastwood, Ruth Helfinstein, Anne Jones, Jason Rusoff, Hal Wine, Craig Zarmer","24","11","UNITED STATES","APPLE COMPUTER, INC.","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5664117","0","3","0.8","Jasmin Ajanovic, Dahmane Dahmani, Nilesh Shah","24","25","UNITED STATES","INTEL CORPORATION","Electrical Computers and Digital Data Processing Systems:  Input/Output","Computer Hardware & Software"
+"5673399","0","3","0.8","Guy Guthrie, Danny Neal, Edward Silha, Steven Thurber","18","4","UNITED STATES","INTERNATIONAL BUSINESS MACHINES CORPORATION","Electrical Computers and Digital Data Processing Systems:  Input/Output","Computer Hardware & Software"
+"5696898","0","3","0.8","Brenda Baker, Eric Grosse","18","12","UNITED STATES","LUCENT TECHNOLOGIES INC.","Electrical Computers and Digital Processing Systems:  Support","Computer Hardware & Software"
+"5538913","0","2","0.75","Gary Hong","26","6","TAIWAN","UNITED MICROELECTRONICS CORPORATION","Semiconductor Device Manufacturing: Process","Semiconductor Devices"

@@ -1,0 +1,11 @@
+Id,indegree,outdegree,inventor,citedby,citingno,country,company,class,subcategory
+"5281218","17","0","Mir Imran","89","7","UNITED STATES","CARDIAC PATHWAYS CORPORATION","Surgery","Surgery & Med Inst."
+"5300099","17","0","Eric Rudie","52","4","UNITED STATES","UROLOGIX, INC.","Surgery: Light, Thermal, and Electrical Application","Surgery & Med Inst."
+"5281213","15","0","A Hed, Fredric Milder","66","27","UNITED STATES","IMPLEMED, INC.","Surgery","Surgery & Med Inst."
+"5300069","15","0","Lloyd Detwiler, Daniel Hunsberger, Robert Pflug","48","8","UNITED STATES","None","Surgery","Surgery & Med Inst."
+"5290286","12","0","David Parins","73","12","UNITED STATES","EVEREST MEDICAL CORPORATION","Surgery","Surgery & Med Inst."
+"5278318","11","0","Roshantha Chandraratna","60","19","UNITED STATES","ALLERGAN, INC.","Organic Compounds -- Part of the Class 532-570 Series","Organic Compounds"
+"5281217","11","0","Stuart Edwards, Jerome Jackson, Thomas Morse, Patrick Owens, Roger Stern","66","5","UNITED STATES","EP TECHNOLOGIES, INC.","Surgery","Surgery & Med Inst."
+"5275851","10","0","Stephen Fonash, Gang Liu","110","2","UNITED STATES","PENN STATE RESEARCH FOUNDATION, INC.","Semiconductor Device Manufacturing: Process","Semiconductor Devices"
+"5293869","10","0","Stuart Edwards, Jerome Jackson","97","33","UNITED STATES","EP TECHNOLOGIES, INC.","Surgery","Surgery & Med Inst."
+"5313943","10","0","Stuart Edwards, Russell Houser, Thomas Kordis","91","34","UNITED STATES","EP TECHNOLOGIES, INC.","Surgery","Surgery & Med Inst."
