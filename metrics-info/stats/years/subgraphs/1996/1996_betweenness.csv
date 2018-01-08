@@ -1,0 +1,11 @@
+Id,indegree,outdegree,betweenesscentrality,Wynalazcy,Kraj,Firma,Klasa,Podkategoria
+"5572643","12","3","39","David Judson","UNITED STATES","None","Electrical Computers and Digital Processing Systems:  Multiple Computer or Process Coordinating","Computer Hardware & Software"
+"5544327","2","3","6","Asit Dan, Dinkar Sitaram","UNITED STATES","INTERNATIONAL BUSINESS MACHINES CORPORATION","Electrical Computers and Digital Processing Systems:  Multiple Computer or Process Coordinating","Computer Hardware & Software"
+"5706502","1","5","5.333333","Jill Foley, Karen Sielski","UNITED STATES","SUN MICROSYSTEMS, INC.","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5659729","1","1","4","Jakob Nielsen","UNITED STATES","SUN MICROSYSTEMS, INC.","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5715453","1","2","3.333333","Gordon Stewart","UNITED STATES","INTERNATIONAL BUSINESS MACHINES CORPORATION","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5590197","3","1","3","James Chen, Jieh-Shan Wang","UNITED STATES","V-ONE CORPORATION","Data Processing: Financial, Business Practice, Management, or Cost/Price Determination","Computer Hardware & Software"
+"5619557","1","4","3","Paul Van Berkum","UNITED STATES","ROCKWELL INTERNATIONAL CORPORATION","Telephonic Communications","Communications"
+"5649186","2","1","3","Gregory Ferguson","UNITED STATES","SILICON GRAPHICS, INC.","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5708780","1","3","3","Thomas Levergood, Stephen Morris, Andrew Payne, Lawrence Stewart, George Treese","UNITED STATES","OPEN MARKET, INC.","Electrical Computers and Digital Processing Systems:  Multiple Computer or Process Coordinating","Computer Hardware & Software"
+"5594789","1","2","2","Alex McAllister, John Seazholtz","UNITED STATES","BELL ATLANTIC NETWORK SERVICES, INC.","Telephonic Communications","Communications"

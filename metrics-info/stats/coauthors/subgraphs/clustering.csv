@@ -1,0 +1,11 @@
+Id,Degree,Weighted Degree,clustering,Imię i nazwisko,Kraj,Stan,Miasto,Firmy,Branże
+"2778764","7","220","0.952381","Christa  Fest","GERMANY","None","Wuppertal","BAYER AKTIENGESELLSCHAFT","Drugs, Agriculture,Food,Textiles, Organic Compounds"
+"4282923","7","273","0.952381","Joachim  Kluth","GERMANY","None","Langenfeld","BAYER AKTIENGESELLSCHAFT","Agriculture,Food,Textiles, Organic Compounds"
+"4282924","7","228","0.952381","Rolf  Kirsten","GERMANY","None","Monheim","BAYER AKTIENGESELLSCHAFT","Drugs, Agriculture,Food,Textiles, Organic Compounds"
+"4175177","5","129","0.9","Siegfried  Goldmann","GERMANY","None","Wuppertal","BAYER AKTIENGESELLSCHAFT, None","Drugs, Organic Compounds"
+"4254834","5","196","0.9","Junji  Hirokane","JAPAN","None","Nara","SHARP KABUSHIKI KAISHA (SHARP CORPORATION)","Miscellaneous-Others, Information Storage, Miscellaneous-chemical, Computer Peripherials"
+"4282103","5","202","0.9","Junichiro  Nakayama","JAPAN","None","Nara-ken","SHARP KABUSHIKI KAISHA (SHARP CORPORATION)","Miscellaneous-Others, Miscellaneous-Elec"
+"4282928","5","146","0.9","Klaus  Konig","GERMANY","None","Odenthal","BAYER AKTIENGESELLSCHAFT, RHEIN-CHEMIE RHEINAU GMBH, WOLFF WALSRODE AKTIENGESELLSCHAFT","Drugs, Agriculture,Food,Textiles, Organic Compounds, Miscellaneous-chemical, Resins"
+"1122395","6","196","0.866667","Edward J. Granda","UNITED STATES","NEW JERSEY","Englishtown","INTERNATIONAL FLAVORS + FRAGRANCES INC","Drugs, Organic Compounds, Agriculture,Husbandry,Food, Miscellaneous-chemical"
+"4275181","6","211","0.866667","Edward J. Glamkowski","UNITED STATES","NEW JERSEY","Warren","HOECHST MARION ROUSSEL, INC., None, HOECHST-ROUSSEL PHARMACEUTICALS, INC., AMERICAN HOECHST CORPORATION","Drugs, Organic Compounds"
+"4275182","6","207","0.866667","Yulin  Chiang","UNITED STATES","NEW JERSEY","Covent Station","HOECHST MARION ROUSSEL, INC., None, HOECHST-ROUSSEL PHARMACEUTICALS, INC.","Drugs, Organic Compounds"

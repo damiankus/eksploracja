@@ -1,0 +1,11 @@
+Id,indegree,outdegree,closnesscentrality,Wynalazcy,Kraj,Firma,Klasa,Podkategoria
+"5870759","0","5","0.857143","Jonathan Bauer, Andrew Bodge, Steven Huberman","UNITED STATES","ORACLE CORPORATION","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5809500","0","4","0.833333","Daniel Nolan","UNITED STATES","CENTURY TECHNOLOGY SERVICES, INC.","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5819258","0","3","0.8","Mayank Prakash, Robert Travis, Shivakumar Vaithyanathan","UNITED STATES","DIGITAL EQUIPMENT CORPORATION","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5784564","0","5","0.777778","Allan Camaisa, Timothy Klepeis, Kevin Walden","UNITED STATES","HIGH TECHNOLOGY SOLUTIONS, INC.","Electrical Computers and Digital Processing Systems:  Multiple Computer or Process Coordinating","Computer Hardware & Software"
+"5796952","0","7","0.769231","Owen Davis, Vidyut Jain","UNITED STATES","DOT COM DEVELOPMENT, INC.","Electrical Computers and Digital Processing Systems:  Multiple Computer or Process Coordinating","Computer Hardware & Software"
+"5754801","0","2","0.75","Drew Dutton, Andy Lambrecht, Scott Swanstrom","UNITED STATES","ADVANCED MICRO DEVICES, INC.","Electrical Computers and Digital Data Processing Systems:  Input/Output","Computer Hardware & Software"
+"5771354","0","2","0.75","Christopher Crawford","UNITED STATES","None","Electrical Computers and Digital Processing Systems:  Multiple Computer or Process Coordinating","Computer Hardware & Software"
+"5801082","0","2","0.75","Horng-Huei Tseng","TAIWAN","VANGUARD INTERNATIONAL SEMICONDUCTOR CORPORATION","Semiconductor Device Manufacturing: Process","Semiconductor Devices"
+"5822749","0","2","0.75","Brijesh Agarwal","UNITED STATES","SYBASE, INC.","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5787425","0","3","0.714286","Joseph Bigus","UNITED STATES","INTERNATIONAL BUSINESS MACHINES CORPORATION","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"

@@ -401,6 +401,33 @@ SELECT * FROM get_patent_data(5421819);
 -- ////////////////////////////////////////////////////////////
 -- ////////////////////////////////////////////////////////////
 
+DROP FUNCTION get_inventor_data(integer)
+CREATE OR REPLACE FUNCTION get_inventor_data(inv_id integer)
+RETURNS TABLE(name TEXT, country VARCHAR(128), state CHAR(128), city CHAR(20),
+	      company CHAR(80), class CHAR(256), subcat VARCHAR(128)) AS $$
+BEGIN
+	RETURN QUERY
+	SELECT (firstname || ' ' || midnam || ' ' || lastnam) AS name,
+	c.country, s.state, i.city,
+	com.compname AS company, cls.title as class, subcat.subcatname as subcat
+	from inventors AS i
+	JOIN countries AS c ON c.code = i.country
+	LEFT OUTER JOIN states AS s ON s.code = i.postate
+	JOIN patent_inventor AS pi ON pi.inventor_id = i.id
+	JOIN patents AS p ON p.patent = pi.patent_id
+	JOIN classes AS cls ON cls.class = p.nclass
+	JOIN subcategories AS subcat ON subcat.subcat = p.subcat
+	LEFT OUTER JOIN companies AS com ON com.assignee = p.assignee
+	WHERE i.id = inv_id
+	GROUP BY i.firstname, i.midnam, i.lastnam, company, c.country, s.state, i.city,company, cls.title, subcat.subcatname
+	ORDER BY cls.title, subcat.subcatname;
+END; $$ LANGUAGE plpgsql;
+SELECT * FROM get_inventor_data(2944140);
+select * from inventors where id = 2944140
+
+
+-- ////////////////////////////////////////////////////////////
+-- ////////////////////////////////////////////////////////////
 
 -- start_year, end_year, delta, threshold, step
 SELECT save_citations_within_period(1993, 1993, 2, 30, 1);

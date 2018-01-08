@@ -6,15 +6,17 @@ import os
 import psycopg2
 
 
-def fetch_patent_data(root_path, connection, sep=',', psep=os.path.sep):
+def fetch_inventor_data(root_path, connection, sep=',', psep=os.path.sep):
     cursor = connection.cursor()
-    statement = 'SELECT inventor AS "Wynalazcy", country AS "Kraj", \
-        company AS "Firma", class AS "Klasa", subcategory AS "Podkategoria" \
-        FROM get_patent_data(%s)'
+
+    statement = 'SELECT name AS "Imię i nazwisko", \
+        country AS "Kraj", state AS "Stan", city AS "Miasto", \
+        company AS "Firmy", subcat AS "Branże" \
+        FROM get_inventor_data(%s) ORDER BY company, subcat'
     target_root_dir = 'metrics-info'
 
     try:
-        for csv_path in glob(os.path.join(root_path, '*', '*.csv')):
+        for csv_path in glob(os.path.join(root_path, '*.csv')):
             path_levels = csv_path.split(psep)
             target_dir = psep.join([target_root_dir] + path_levels[1:-1])
             target_path = psep.join([target_dir, path_levels[-1]])
@@ -31,7 +33,7 @@ def fetch_patent_data(root_path, connection, sep=',', psep=os.path.sep):
 
                     for line in csv:
                         metrics_row = line.strip().split(sep)
-                        print('Patent ID: {}'.format(metrics_row[0]))
+                        print('Inventor ID: {}'.format(metrics_row[0]))
 
                         # The first column contains patent ID
                         cursor.execute(statement, [metrics_row[0]])
@@ -44,9 +46,11 @@ def fetch_patent_data(root_path, connection, sep=',', psep=os.path.sep):
                             first_query = False
                             target.write(','.join(colnames) + '\r\n')
 
-                        inventors = [', '.join([row[0] for row in rows])]
-                        csv_row = metrics_row + inventors + [str(e).strip() for e in rows[0][1:]]
-                        csv_row = sep.join(['"' + e + '"' for e in csv_row])
+                        common_cols = [str(col).strip() for col in rows[0][:4]]
+                        companies = [', '.join(set([str(row[4]).strip() for row in rows]))]
+                        branches = [', '.join(set([str(row[5]).strip() for row in rows]))]
+                        csv_row = metrics_row + common_cols + companies + branches
+                        csv_row = sep.join(['"' + str(e) + '"' for e in csv_row])
                         target.write(csv_row + '\r\n')
 
     except Exception as e:
@@ -56,7 +60,7 @@ def fetch_patent_data(root_path, connection, sep=',', psep=os.path.sep):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Fetch patent data based on \
+    parser = argparse.ArgumentParser(description='Fetch inventor data based on \
         the content of CSV files')
     parser.add_argument('--root', '-r', help='Path of the root directory \
         to traverse', required=True)
@@ -70,7 +74,7 @@ if __name__ == '__main__':
 
     try:
         connection = psycopg2.connect(**db_config)
-        fetch_patent_data(args.root, connection)
+        fetch_inventor_data(args.root, connection)
     except Exception as e:
         if (connection):
             connection.close()

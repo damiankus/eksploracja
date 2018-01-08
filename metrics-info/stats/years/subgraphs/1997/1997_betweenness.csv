@@ -1,0 +1,11 @@
+Id,indegree,outdegree,betweenesscentrality,Wynalazcy,Kraj,Firma,Klasa,Podkategoria
+"5706502","2","3","6","Jill Foley, Karen Sielski","UNITED STATES","SUN MICROSYSTEMS, INC.","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5673382","1","2","4","David Cannon, Michael Kaczmarski","UNITED STATES","INTERNATIONAL BUSINESS MACHINES CORPORATION","Error Detection/Correction and Fault Detection/Recovery","Computer Hardware & Software"
+"5706507","2","2","4","Robert Schloss","UNITED STATES","INTERNATIONAL BUSINESS MACHINES CORPORATION","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5740433","1","2","4","Richard Carr, Brian Garrard, Malcolm Mosher","UNITED STATES","TANDEM COMPUTERS INCORPORATED","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5724424","1","3","3","David Gifford","UNITED STATES","OPEN MARKET, INC.","Data Processing: Financial, Business Practice, Management, or Cost/Price Determination","Computer Hardware & Software"
+"5710884","1","2","2","Rick Dedrick","UNITED STATES","INTEL CORPORATION","Electrical Computers and Digital Processing Systems:  Multiple Computer or Process Coordinating","Computer Hardware & Software"
+"5712979","1","2","2","Terry Graber, Joshua Kopelman, Edwin Watkeys, Marvin Weinberger","UNITED STATES","INFONAUTICS CORPORATION","Electrical Computers and Digital Processing Systems:  Multiple Computer or Process Coordinating","Computer Hardware & Software"
+"5727199","1","2","2","Ming-Syan Chen, Philip Yu","UNITED STATES","INTERNATIONAL BUSINESS MACHINES CORPORATION","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5761663","1","3","2","Konrad Lagarde, Richard Rogers","UNITED STATES","INTERNATIONAL BUSINESS MACHINES CORPORATION","Data Processing:  Database and File Management, Data Structures, or Document Processing","Computer Hardware & Software"
+"5664218","1","1","1","Ha-Jae Chung, Hyun-Ki Kim, Jin Lee, Ok-Keun Shin","SOUTH KOREA","ELECTRONICS AND TELECOMMUNICATIONS RESEARCH INSTITUTE","Electrical Computers and Digital Data Processing Systems:  Input/Output","Computer Hardware & Software"
